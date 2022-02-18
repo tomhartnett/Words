@@ -5,9 +5,14 @@
 //  Created by Tom Hartnett on 2/16/22.
 //
 
+import Combine
 import UIKit
 
 class ViewController: UIViewController {
+
+    private enum Section {
+        case words
+    }
 
     private let textField: UITextField = {
         let t = UITextField(frame: .zero)
@@ -26,12 +31,34 @@ class ViewController: UIViewController {
         return t
     }()
 
+    private var dataSource: UITableViewDiffableDataSource<Section, String>?
+
     private lazy var wordList = WordList()
+
+    private var subsciptions = Set<AnyCancellable>()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         constructView()
+
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "thecell")
+        dataSource = UITableViewDiffableDataSource<Section, String>(tableView: tableView) { t, indexPath, word in
+            let cell = t.dequeueReusableCell(withIdentifier: "thecell", for: indexPath)
+            cell.textLabel?.text = word
+            cell.backgroundColor = .clear
+            return cell
+        }
+
+        wordList.$results
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [unowned self] words in
+                var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
+                snapshot.appendSections([.words])
+                snapshot.appendItems(words)
+                self.dataSource?.apply(snapshot)
+            })
+            .store(in: &subsciptions)
     }
 
     private func constructView() {
@@ -68,6 +95,7 @@ extension ViewController: UITextFieldDelegate {
 
         // Allow deletions
         if string == "" {
+            wordList.search(pattern: textField.text)
             return true
         }
 
@@ -104,6 +132,8 @@ extension ViewController: UITextFieldDelegate {
             textField.text = text.replacingCharacters(in: textRange,
                                                       with: newReplacementString)
         }
+
+        wordList.search(pattern: textField.text)
 
         return false
     }
