@@ -46,10 +46,16 @@ class ViewController: UIViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
         dataSource = UITableViewDiffableDataSource<Section, String>(tableView: tableView) { t, indexPath, word in
             let cell = t.dequeueReusableCell(withIdentifier: UITableViewCell.reuseIdentifier, for: indexPath)
+
             var content = cell.defaultContentConfiguration()
             content.text = word
+            if let font = UIFont(name: "Courier New", size: 20) {
+                content.textProperties.font = font
+            }
+
             cell.contentConfiguration = content
             cell.backgroundColor = .clear
+
             return cell
         }
 
