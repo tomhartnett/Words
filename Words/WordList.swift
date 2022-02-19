@@ -37,33 +37,18 @@ class WordList {
         }
     }
 
-    func search(pattern: String?) {
-        guard let input = pattern else {
+    func search(for string: String?) {
+        guard let string = string?.lowercased(), !string.isEmpty, string.count <= 5 else {
             results = []
             return
         }
 
-        let characters = input.uppercased().map { $0 }
+        let dots = String(repeating: ".", count: 5 - string.count)
+        let pattern = "\(string)\(dots)"
+
         let filteredWords = words.filter({
-            var containsAllCharacters = true
-            for c in characters {
-                if c == "." {
-                    continue
-                }
-
-                if !$0.uppercased().contains(c) {
-                    containsAllCharacters = false
-                }
-            }
-
-            return containsAllCharacters
+            $0.lowercased().range(of: "\\b\(pattern)\\b", options: .regularExpression) != nil
         })
-
-        /*
-         let invitation = "Fancy a game of Cluedo™?"
-         invitation.range(of: #"\bClue(do)?™?\b"#,
-                          options: .regularExpression) != nil // true
-         */
 
         results = filteredWords
     }

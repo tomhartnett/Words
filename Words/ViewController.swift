@@ -19,6 +19,7 @@ class ViewController: UIViewController {
         t.placeholder = "Search for words"
         t.borderStyle = .roundedRect
         t.returnKeyType = .done
+        t.autocapitalizationType = .none
         t.font = UIFont(name: "Courier New Bold", size: 20)
         t.translatesAutoresizingMaskIntoConstraints = false
         return t
@@ -26,7 +27,7 @@ class ViewController: UIViewController {
 
     private let tableView: UITableView = {
         let t = UITableView(frame: .zero)
-
+        t.allowsSelection = false
         t.translatesAutoresizingMaskIntoConstraints = false
         return t
     }()
@@ -42,10 +43,12 @@ class ViewController: UIViewController {
 
         constructView()
 
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "thecell")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
         dataSource = UITableViewDiffableDataSource<Section, String>(tableView: tableView) { t, indexPath, word in
-            let cell = t.dequeueReusableCell(withIdentifier: "thecell", for: indexPath)
-            cell.textLabel?.text = word
+            let cell = t.dequeueReusableCell(withIdentifier: UITableViewCell.reuseIdentifier, for: indexPath)
+            var content = cell.defaultContentConfiguration()
+            content.text = word
+            cell.contentConfiguration = content
             cell.backgroundColor = .clear
             return cell
         }
@@ -56,14 +59,13 @@ class ViewController: UIViewController {
                 var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
                 snapshot.appendSections([.words])
                 snapshot.appendItems(words)
-                self.dataSource?.apply(snapshot)
+                self.dataSource?.apply(snapshot, animatingDifferences: false)
             })
             .store(in: &subsciptions)
     }
 
     private func constructView() {
         let backgroundColor = UIColor(named: "Parchment")
-
         view.backgroundColor = backgroundColor
         textField.backgroundColor = backgroundColor
         tableView.backgroundColor = backgroundColor
@@ -95,7 +97,12 @@ extension ViewController: UITextFieldDelegate {
 
         // Allow deletions
         if string == "" {
-            wordList.search(pattern: textField.text)
+            if let text = textField.text,
+               let textRange = Range(range, in: text) {
+                textField.text = text.replacingCharacters(in: textRange,
+                                                          with: string)
+            }
+            wordList.search(for: textField.text)
             return true
         }
 
@@ -133,8 +140,14 @@ extension ViewController: UITextFieldDelegate {
                                                       with: newReplacementString)
         }
 
-        wordList.search(pattern: textField.text)
+        wordList.search(for: textField.text)
 
         return false
+    }
+}
+
+private extension UITableViewCell {
+    static var reuseIdentifier: String {
+        return "WordCell"
     }
 }
