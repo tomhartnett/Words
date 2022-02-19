@@ -20,6 +20,8 @@ class ViewController: UIViewController {
         t.borderStyle = .roundedRect
         t.returnKeyType = .done
         t.autocapitalizationType = .none
+        t.autocorrectionType = .no
+        t.clearButtonMode = .always
         t.font = UIFont(name: "Courier New Bold", size: 20)
         t.translatesAutoresizingMaskIntoConstraints = false
         return t
@@ -149,6 +151,11 @@ extension ViewController: UITextFieldDelegate {
         wordList.search(for: textField.text)
 
         return false
+    }
+
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        wordList.search(for: nil)
+        return true
     }
 }
 
