@@ -46,10 +46,13 @@ class WordList {
         let dots = String(repeating: ".", count: 5 - string.count)
         let pattern = "\(string)\(dots)"
 
-        let filteredWords = words.filter({
-            $0.lowercased().range(of: "\\b\(pattern)\\b", options: .regularExpression) != nil
-        })
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            guard let self = self else { return }
+            let filteredWords = self.words.filter({
+                $0.lowercased().range(of: "\\b\(pattern)\\b", options: .regularExpression) != nil
+            })
 
-        results = filteredWords
+            self.results = filteredWords
+        }
     }
 }

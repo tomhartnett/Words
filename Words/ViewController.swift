@@ -111,7 +111,7 @@ extension ViewController: UITextFieldDelegate {
                                                           with: string)
             }
             wordList.search(for: textField.text)
-            return true
+            return false
         }
 
         // Dismiss keyboard
