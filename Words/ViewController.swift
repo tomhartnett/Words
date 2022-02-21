@@ -75,7 +75,11 @@ class ViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [unowned self] words in
                 let count = words.count
-                resultsLabel.text = "\(count) words"
+                if count == 1 {
+                    resultsLabel.text = "\(count) word"
+                } else {
+                    resultsLabel.text = "\(count) words"
+                }
                 resultsLabel.isHidden = count == 0
 
                 var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
@@ -99,8 +103,8 @@ class ViewController: UIViewController {
         stackView.addArrangedSubview(answerTextField)
         stackView.addArrangedSubview(exclusionsTextField)
         stackView.addArrangedSubview(resultsLabel)
-        stackView.addArrangedSubview(tableView)
         view.addSubview(stackView)
+        view.addSubview(tableView)
 
         let margin: CGFloat = 16
 
@@ -108,7 +112,10 @@ class ViewController: UIViewController {
             stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: margin),
             stackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin),
             stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin),
-            stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            tableView.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: margin),
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
 
