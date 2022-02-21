@@ -14,9 +14,30 @@ class ViewController: UIViewController {
         case words
     }
 
-    private let textField: UITextField = {
+    private let stackView: UIStackView = {
+        let s = UIStackView(frame: .zero)
+        s.axis = .vertical
+        s.spacing = 16
+        s.translatesAutoresizingMaskIntoConstraints = false
+        return s
+    }()
+
+    private let answerTextField: UITextField = {
         let t = UITextField(frame: .zero)
         t.placeholder = "Search for words"
+        t.borderStyle = .roundedRect
+        t.returnKeyType = .done
+        t.autocapitalizationType = .none
+        t.autocorrectionType = .no
+        t.clearButtonMode = .always
+        t.font = UIFont(name: "Courier New Bold", size: 20)
+        t.translatesAutoresizingMaskIntoConstraints = false
+        return t
+    }()
+
+    private let excludedTextField: UITextField = {
+        let t = UITextField(frame: .zero)
+        t.placeholder = "Excluding letters"
         t.borderStyle = .roundedRect
         t.returnKeyType = .done
         t.autocapitalizationType = .none
@@ -45,21 +66,7 @@ class ViewController: UIViewController {
 
         constructView()
 
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
-        dataSource = UITableViewDiffableDataSource<Section, String>(tableView: tableView) { t, indexPath, word in
-            let cell = t.dequeueReusableCell(withIdentifier: UITableViewCell.reuseIdentifier, for: indexPath)
-
-            var content = cell.defaultContentConfiguration()
-            content.text = word
-            if let font = UIFont(name: "Courier New", size: 20) {
-                content.textProperties.font = font
-            }
-
-            cell.contentConfiguration = content
-            cell.backgroundColor = .clear
-
-            return cell
-        }
+        configureTable()
 
         wordList.$results
             .receive(on: DispatchQueue.main)
@@ -75,25 +82,48 @@ class ViewController: UIViewController {
     private func constructView() {
         let backgroundColor = UIColor(named: "Parchment")
         view.backgroundColor = backgroundColor
-        textField.backgroundColor = backgroundColor
+        answerTextField.backgroundColor = backgroundColor
+        excludedTextField.backgroundColor = backgroundColor
         tableView.backgroundColor = backgroundColor
 
-        textField.delegate = self
+        answerTextField.delegate = self
+        excludedTextField.delegate = self
 
-        view.addSubview(textField)
-        view.addSubview(tableView)
+        stackView.addArrangedSubview(answerTextField)
+        stackView.addArrangedSubview(excludedTextField)
+        stackView.addArrangedSubview(tableView)
+        view.addSubview(stackView)
 
         let margin: CGFloat = 16
 
         NSLayoutConstraint.activate([
-            textField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: margin),
-            textField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin),
-            textField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin),
-            tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: margin),
-            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin),
-            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: margin),
+            stackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin),
+            stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin),
+            stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
+    }
+
+    private func configureTable() {
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
+        dataSource = UITableViewDiffableDataSource<Section, String>(tableView: tableView) { t, indexPath, word in
+            let cell = t.dequeueReusableCell(withIdentifier: UITableViewCell.reuseIdentifier, for: indexPath)
+
+            var content = cell.defaultContentConfiguration()
+            content.text = word
+            if let font = UIFont(name: "Courier New", size: 20) {
+                content.textProperties.font = font
+            }
+
+            cell.contentConfiguration = content
+            cell.backgroundColor = .clear
+
+            return cell
+        }
+    }
+
+    private func handleAnswerInput(currentText: String?, input: Character, range: NSRange) -> String? {
+        return nil
     }
 }
 
@@ -110,7 +140,7 @@ extension ViewController: UITextFieldDelegate {
                 textField.text = text.replacingCharacters(in: textRange,
                                                           with: string)
             }
-            wordList.search(for: textField.text)
+            wordList.search(for: answerTextField.text, excluding: excludedTextField.text)
             return false
         }
 
@@ -130,9 +160,16 @@ extension ViewController: UITextFieldDelegate {
             return false
         }
 
-        // Only allow letters, space, and period `.`
-        guard character.isLetter || character == " " || character == "." else {
-            return false
+        if textField === answerTextField {
+            // Only allow letters, space, and period `.`
+            guard character.isLetter || character == " " || character == "." else {
+                return false
+            }
+        } else {
+            // Only allow letters in excluded characters field
+            guard character.isLetter else {
+                return false
+            }
         }
 
         let newReplacementString: String
@@ -148,14 +185,21 @@ extension ViewController: UITextFieldDelegate {
                                                       with: newReplacementString)
         }
 
-        wordList.search(for: textField.text)
+        wordList.search(for: answerTextField.text, excluding: excludedTextField.text)
 
         return false
     }
 
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        wordList.search(for: nil)
-        return true
+        if textField === answerTextField {
+            answerTextField.text = ""
+        } else {
+            excludedTextField.text = ""
+        }
+
+        wordList.search(for: answerTextField.text, excluding: excludedTextField.text)
+
+        return false
     }
 }
 

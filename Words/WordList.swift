@@ -37,7 +37,7 @@ class WordList {
         }
     }
 
-    func search(for string: String?) {
+    func search(for string: String?, excluding excludedCharacters: String? = nil) {
         guard let string = string?.lowercased(), !string.isEmpty, string.count <= 5 else {
             results = []
             return
@@ -46,10 +46,24 @@ class WordList {
         let dots = String(repeating: ".", count: 5 - string.count)
         let pattern = "\(string)\(dots)"
 
+        var patternWithExcluded: String = ""
+        if let excludedCharacters = excludedCharacters, !excludedCharacters.isEmpty {
+            pattern.forEach {
+                if $0 == "." {
+                    // \b[^uo]t..r\b
+                    patternWithExcluded.append("[^\(excludedCharacters.lowercased())]")
+                } else {
+                    patternWithExcluded.append($0)
+                }
+            }
+        } else {
+            patternWithExcluded = pattern
+        }
+
         DispatchQueue.global(qos: .userInteractive).async { [weak self] in
             guard let self = self else { return }
             let filteredWords = self.words.filter({
-                $0.lowercased().range(of: "\\b\(pattern)\\b", options: .regularExpression) != nil
+                $0.lowercased().range(of: "\\b\(patternWithExcluded)\\b", options: .regularExpression) != nil
             })
 
             self.results = filteredWords
