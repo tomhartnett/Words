@@ -10,10 +10,6 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    private enum Section {
-        case words
-    }
-
     private let stackView: UIStackView = {
         let s = UIStackView(frame: .zero)
         s.axis = .vertical
@@ -35,7 +31,7 @@ class ViewController: UIViewController {
         return t
     }()
 
-    private let excludedTextField: UITextField = {
+    private let exclusionsTextField: UITextField = {
         let t = UITextField(frame: .zero)
         t.placeholder = "Excluding letters"
         t.borderStyle = .roundedRect
@@ -48,6 +44,13 @@ class ViewController: UIViewController {
         return t
     }()
 
+    private let resultsLabel: UILabel = {
+        let l = UILabel(frame: .zero)
+        l.font = UIFont(name: "Courier New", size: 18)
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+
     private let tableView: UITableView = {
         let t = UITableView(frame: .zero)
         t.allowsSelection = false
@@ -55,7 +58,7 @@ class ViewController: UIViewController {
         return t
     }()
 
-    private var dataSource: UITableViewDiffableDataSource<Section, String>?
+    private var dataSource: ResultsDataSource?
 
     private lazy var wordList = WordList()
 
@@ -68,9 +71,13 @@ class ViewController: UIViewController {
 
         configureTable()
 
-        wordList.$results
+        wordList.results
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [unowned self] words in
+                let count = words.count
+                resultsLabel.text = "\(count) words"
+                resultsLabel.isHidden = count == 0
+
                 var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
                 snapshot.appendSections([.words])
                 snapshot.appendItems(words)
@@ -83,14 +90,15 @@ class ViewController: UIViewController {
         let backgroundColor = UIColor(named: "Parchment")
         view.backgroundColor = backgroundColor
         answerTextField.backgroundColor = backgroundColor
-        excludedTextField.backgroundColor = backgroundColor
+        exclusionsTextField.backgroundColor = backgroundColor
         tableView.backgroundColor = backgroundColor
 
         answerTextField.delegate = self
-        excludedTextField.delegate = self
+        exclusionsTextField.delegate = self
 
         stackView.addArrangedSubview(answerTextField)
-        stackView.addArrangedSubview(excludedTextField)
+        stackView.addArrangedSubview(exclusionsTextField)
+        stackView.addArrangedSubview(resultsLabel)
         stackView.addArrangedSubview(tableView)
         view.addSubview(stackView)
 
@@ -106,7 +114,7 @@ class ViewController: UIViewController {
 
     private func configureTable() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
-        dataSource = UITableViewDiffableDataSource<Section, String>(tableView: tableView) { t, indexPath, word in
+        dataSource = ResultsDataSource(tableView: tableView) { t, indexPath, word in
             let cell = t.dequeueReusableCell(withIdentifier: UITableViewCell.reuseIdentifier, for: indexPath)
 
             var content = cell.defaultContentConfiguration()
@@ -120,10 +128,6 @@ class ViewController: UIViewController {
 
             return cell
         }
-    }
-
-    private func handleAnswerInput(currentText: String?, input: Character, range: NSRange) -> String? {
-        return nil
     }
 }
 
@@ -140,7 +144,9 @@ extension ViewController: UITextFieldDelegate {
                 textField.text = text.replacingCharacters(in: textRange,
                                                           with: string)
             }
-            wordList.search(for: answerTextField.text, excluding: excludedTextField.text)
+
+            wordList.search(for: answerTextField.text, excluding: exclusionsTextField.text)
+
             return false
         }
 
@@ -185,7 +191,7 @@ extension ViewController: UITextFieldDelegate {
                                                       with: newReplacementString)
         }
 
-        wordList.search(for: answerTextField.text, excluding: excludedTextField.text)
+        wordList.search(for: answerTextField.text, excluding: exclusionsTextField.text)
 
         return false
     }
@@ -194,10 +200,10 @@ extension ViewController: UITextFieldDelegate {
         if textField === answerTextField {
             answerTextField.text = ""
         } else {
-            excludedTextField.text = ""
+            exclusionsTextField.text = ""
         }
 
-        wordList.search(for: answerTextField.text, excluding: excludedTextField.text)
+        wordList.search(for: answerTextField.text, excluding: exclusionsTextField.text)
 
         return false
     }
@@ -208,3 +214,9 @@ private extension UITableViewCell {
         return "WordCell"
     }
 }
+
+private enum Section {
+    case words
+}
+
+private typealias ResultsDataSource = UITableViewDiffableDataSource<Section, String>
