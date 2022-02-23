@@ -11,14 +11,14 @@ import Foundation
 class WordList {
 
     var results: AnyPublisher<[String], Never> {
-        _results.eraseToAnyPublisher()
+        resultsSubject.eraseToAnyPublisher()
     }
 
-    private let _results = PassthroughSubject<[String], Never>()
+    private let resultsSubject = PassthroughSubject<[String], Never>()
 
-    private let _answer = CurrentValueSubject<String, Never>("")
+    private let answerSubject = PassthroughSubject<String, Never>()
 
-    private let _exclusions = CurrentValueSubject<String, Never>("")
+    private let exclusionsSubject = PassthroughSubject<String, Never>()
 
     private let words: [String]
 
@@ -47,14 +47,13 @@ class WordList {
             fatalError("Word list is empty")
         }
 
-        subscription = Publishers.CombineLatest(_answer, _exclusions)
-            .dropFirst()
-            .throttle(for: .milliseconds(1500), scheduler: DispatchQueue.global(qos: .background), latest: true)
+        subscription = Publishers.CombineLatest(answerSubject, exclusionsSubject)
+            .throttle(for: .milliseconds(1000), scheduler: DispatchQueue.global(qos: .background), latest: true)
             .sink(receiveValue: { [weak self] answer, exclusions in
                 guard let self = self else { return }
 
                 guard !answer.isEmpty, answer.count <= 5, answer.first(where: { $0 != "." }) != nil else {
-                    self._results.send([])
+                    self.resultsSubject.send([])
                     return
                 }
 
@@ -65,7 +64,7 @@ class WordList {
                 if !exclusions.isEmpty {
                     pattern.forEach {
                         if $0 == "." {
-                            // \b[^uo]t..r\b
+                            // \b[^abc]t[^abc][^abc]r\b
                             patternWithExcluded.append("[^\(exclusions.lowercased())]")
                         } else {
                             patternWithExcluded.append($0)
@@ -79,12 +78,12 @@ class WordList {
                     $0.lowercased().range(of: "\\b\(patternWithExcluded)\\b", options: .regularExpression) != nil
                 })
 
-                self._results.send(filteredWords)
+                self.resultsSubject.send(filteredWords)
             })
     }
 
     func search(for string: String?, excluding exclusions: String? = nil) {
-        _answer.value = string ?? ""
-        _exclusions.value = exclusions ?? ""
+        answerSubject.send(string ?? "")
+        exclusionsSubject.send(exclusions ?? "")
     }
 }

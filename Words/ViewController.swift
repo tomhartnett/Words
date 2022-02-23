@@ -58,6 +58,19 @@ class ViewController: UIViewController {
         return t
     }()
 
+    private let clearButton: UIButton = {
+        let b = UIButton()
+        let title = NSAttributedString(
+            string: "Clear",
+            attributes: [NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue]
+        )
+        b.setAttributedTitle(title, for: .normal)
+        b.titleLabel?.font = UIFont(name: "Courier New", size: 15)
+        b.tintColor = UIColor.darkText
+        b.translatesAutoresizingMaskIntoConstraints = false
+        return b
+    }()
+
     private var dataSource: ResultsDataSource?
 
     private lazy var wordList = WordList()
@@ -80,7 +93,6 @@ class ViewController: UIViewController {
                 } else {
                     resultsLabel.text = "\(count) words"
                 }
-                resultsLabel.isHidden = count == 0
 
                 var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
                 snapshot.appendSections([.words])
@@ -88,6 +100,8 @@ class ViewController: UIViewController {
                 self.dataSource?.apply(snapshot, animatingDifferences: false)
             })
             .store(in: &subsciptions)
+
+        wordList.search(for: nil)
     }
 
     private func constructView() {
@@ -100,9 +114,17 @@ class ViewController: UIViewController {
         answerTextField.delegate = self
         exclusionsTextField.delegate = self
 
+        clearButton.addTarget(self, action: #selector(didTapClear), for: .touchUpInside)
+
+        let hstack = UIStackView()
+        hstack.axis = .horizontal
+        hstack.addArrangedSubview(resultsLabel)
+        hstack.addArrangedSubview(UIView())
+        hstack.addArrangedSubview(clearButton)
+
         stackView.addArrangedSubview(answerTextField)
         stackView.addArrangedSubview(exclusionsTextField)
-        stackView.addArrangedSubview(resultsLabel)
+        stackView.addArrangedSubview(hstack)
         view.addSubview(stackView)
         view.addSubview(tableView)
 
@@ -135,6 +157,13 @@ class ViewController: UIViewController {
 
             return cell
         }
+    }
+
+    @objc
+    private func didTapClear() {
+        answerTextField.text = ""
+        exclusionsTextField.text = ""
+        wordList.search(for: nil)
     }
 }
 
