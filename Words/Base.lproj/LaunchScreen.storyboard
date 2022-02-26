@@ -16,18 +16,19 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="WORDS" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L5c-6t-dbj">
-                                <rect key="frame" x="119.5" y="419" width="175" height="58"/>
-                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="48"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Launch" translatesAutoresizingMaskIntoConstraints="NO" id="m1x-iq-lYz">
+                                <rect key="frame" x="87" y="328" width="240" height="240"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="240" id="mUX-yt-N7o"/>
+                                    <constraint firstAttribute="width" constant="240" id="zfB-Rc-sfN"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="Parchment"/>
                         <constraints>
-                            <constraint firstItem="L5c-6t-dbj" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="MAZ-A1-6Od"/>
-                            <constraint firstItem="L5c-6t-dbj" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="fBT-3m-79B"/>
+                            <constraint firstItem="m1x-iq-lYz" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="Sm1-7H-4ev"/>
+                            <constraint firstItem="m1x-iq-lYz" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="qXS-xx-Gcs"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -37,6 +38,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Launch" width="240" height="240"/>
         <namedColor name="Parchment">
             <color red="0.96078431372549022" green="0.92941176470588238" blue="0.85882352941176465" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

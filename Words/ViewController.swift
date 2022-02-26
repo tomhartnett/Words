@@ -26,7 +26,7 @@ class ViewController: UIViewController {
         t.autocapitalizationType = .none
         t.autocorrectionType = .no
         t.clearButtonMode = .always
-        t.font = UIFont(name: "Courier New Bold", size: 20)
+        t.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .bold)
         t.translatesAutoresizingMaskIntoConstraints = false
         return t
     }()
@@ -39,14 +39,14 @@ class ViewController: UIViewController {
         t.autocapitalizationType = .none
         t.autocorrectionType = .no
         t.clearButtonMode = .always
-        t.font = UIFont(name: "Courier New Bold", size: 20)
+        t.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .bold)
         t.translatesAutoresizingMaskIntoConstraints = false
         return t
     }()
 
     private let resultsLabel: UILabel = {
         let l = UILabel(frame: .zero)
-        l.font = UIFont(name: "Courier New", size: 18)
+        l.font = UIFont.monospacedSystemFont(ofSize: 18, weight: .semibold)
         l.translatesAutoresizingMaskIntoConstraints = false
         return l
     }()
@@ -65,7 +65,7 @@ class ViewController: UIViewController {
             attributes: [NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue]
         )
         b.setAttributedTitle(title, for: .normal)
-        b.titleLabel?.font = UIFont(name: "Courier New", size: 15)
+        b.titleLabel?.font = UIFont.monospacedSystemFont(ofSize: 15, weight: .semibold)
         b.tintColor = UIColor.darkText
         b.translatesAutoresizingMaskIntoConstraints = false
         return b
@@ -148,9 +148,7 @@ class ViewController: UIViewController {
 
             var content = cell.defaultContentConfiguration()
             content.text = word
-            if let font = UIFont(name: "Courier New", size: 20) {
-                content.textProperties.font = font
-            }
+            content.textProperties.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .regular)
 
             cell.contentConfiguration = content
             cell.backgroundColor = .clear
