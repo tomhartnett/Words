@@ -125,14 +125,14 @@ class ViewController: UIViewController {
 
         NSLayoutConstraint.activate([
             answerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: margin),
-            answerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin),
-            answerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin),
+            answerView.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor),
+            answerView.trailingAnchor.constraint(equalTo: view.readableContentGuide.trailingAnchor),
             stackView.topAnchor.constraint(equalTo: answerView.bottomAnchor, constant: margin),
-            stackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin),
-            stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin),
+            stackView.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: view.readableContentGuide.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: margin),
-            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.readableContentGuide.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }

@@ -28,7 +28,6 @@ class AnswerView: UIView {
     private let answersStackView: UIStackView = {
         let s = UIStackView(frame: .zero)
         s.axis = .horizontal
-        s.spacing = 5
         s.distribution = .equalSpacing
         s.translatesAutoresizingMaskIntoConstraints = false
         return s
@@ -74,17 +73,41 @@ class AnswerView: UIView {
     private func constructView() {
         addSubview(answersStackView)
 
-        [textField1, textField2, textField3, textField4, textField5].forEach {
+        let textFields = [textField1, textField2, textField3, textField4, textField5]
+
+        textFields.forEach {
             answersStackView.addArrangedSubview($0)
             $0.delegate = self
         }
 
-        NSLayoutConstraint.activate([
-            answersStackView.topAnchor.constraint(equalTo: topAnchor),
-            answersStackView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            answersStackView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            answersStackView.bottomAnchor.constraint(equalTo: bottomAnchor)
-        ])
+        var allConstraints = [NSLayoutConstraint]()
+
+        let leading = answersStackView.leadingAnchor.constraint(equalTo: leadingAnchor)
+        leading.priority = .defaultHigh
+
+        let trailing = answersStackView.trailingAnchor.constraint(equalTo: trailingAnchor)
+        trailing.priority = .defaultHigh
+
+        let centerX = answersStackView.centerXAnchor.constraint(equalTo: centerXAnchor)
+        centerX.priority = .required
+
+        let textFieldWidths: [NSLayoutConstraint] = textFields.map {
+            $0.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.15)
+        }
+
+        let textFieldHeights: [NSLayoutConstraint] = textFields.map {
+            $0.heightAnchor.constraint(equalTo: $0.widthAnchor)
+        }
+
+        allConstraints.append(answersStackView.topAnchor.constraint(equalTo: topAnchor))
+        allConstraints.append(answersStackView.bottomAnchor.constraint(equalTo: bottomAnchor))
+        allConstraints.append(leading)
+        allConstraints.append(trailing)
+        allConstraints.append(centerX)
+        allConstraints.append(contentsOf: textFieldWidths)
+        allConstraints.append(contentsOf: textFieldHeights)
+
+        NSLayoutConstraint.activate(allConstraints)
     }
 }
 
@@ -132,10 +155,6 @@ extension AnswerView: UITextFieldDelegate {
 }
 
 private class AnswerLetterTextField: UITextField {
-    override var intrinsicContentSize: CGSize {
-        CGSize(width: 62, height: 62)
-    }
-
     var value: String {
         let textValue = text ?? ""
         return textValue.isEmpty ? "." : textValue
@@ -148,7 +167,9 @@ private class AnswerLetterTextField: UITextField {
         t.backgroundColor = UIColor(named: "Parchment")
         t.borderStyle = .roundedRect
         t.clearButtonMode = .never
-        t.font = UIFont.systemFont(ofSize: 48)
+        t.font = UIFont.monospacedSystemFont(ofSize: 48, weight: .regular)
+        t.minimumFontSize = 20
+        t.adjustsFontSizeToFitWidth = true
         t.returnKeyType = .done
         t.textAlignment = .center
         return t
