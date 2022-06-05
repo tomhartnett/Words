@@ -228,7 +228,7 @@ extension ViewController: UITextFieldDelegate {
         if let text = textField.text,
            let textRange = Range(range, in: text) {
             textField.text = text.replacingCharacters(in: textRange,
-                                                      with: string)
+                                                      with: string.uppercased())
         }
 
         search()
