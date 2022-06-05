@@ -237,8 +237,9 @@ extension ViewController: UITextFieldDelegate {
     }
 
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        textField.text = ""
         search()
-        return true
+        return false
     }
 }
 
