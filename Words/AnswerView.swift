@@ -22,7 +22,12 @@ class AnswerView: UIView {
         let letter4 = textField4.value
         let letter5 = textField5.value
 
-        return "\(letter1)\(letter2)\(letter3)\(letter4)\(letter5)"
+        let combined = "\(letter1)\(letter2)\(letter3)\(letter4)\(letter5)"
+        if combined == "....." {
+            return ""
+        } else {
+            return combined
+        }
     }
 
     private let answersStackView: UIStackView = {

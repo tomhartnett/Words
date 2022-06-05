@@ -26,7 +26,22 @@ class ViewController: UIViewController {
 
     private let exclusionsTextField: UITextField = {
         let t = UITextField(frame: .zero)
+        t.backgroundColor = UIColor(named: "Parchment")
         t.placeholder = "Excluding letters"
+        t.borderStyle = .roundedRect
+        t.returnKeyType = .done
+        t.autocapitalizationType = .none
+        t.autocorrectionType = .no
+        t.clearButtonMode = .always
+        t.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .bold)
+        t.translatesAutoresizingMaskIntoConstraints = false
+        return t
+    }()
+
+    private let inclusionsTextField: UITextField = {
+        let t = UITextField(frame: .zero)
+        t.backgroundColor = UIColor(named: "Parchment")
+        t.placeholder = "Must include letters"
         t.borderStyle = .roundedRect
         t.returnKeyType = .done
         t.autocapitalizationType = .none
@@ -46,6 +61,7 @@ class ViewController: UIViewController {
 
     private let tableView: UITableView = {
         let t = UITableView(frame: .zero)
+        t.backgroundColor = UIColor(named: "Parchment")
         t.allowsSelection = false
         t.translatesAutoresizingMaskIntoConstraints = false
         return t
@@ -94,18 +110,18 @@ class ViewController: UIViewController {
             })
             .store(in: &subsciptions)
 
-        wordList.search(for: nil)
+        search()
     }
 
     private func constructView() {
-        let backgroundColor = UIColor(named: "Parchment")
-        view.backgroundColor = backgroundColor
-        exclusionsTextField.backgroundColor = backgroundColor
-        tableView.backgroundColor = backgroundColor
+
+        view.backgroundColor = UIColor(named: "Parchment")
 
         answerView.delegate = self
 
         exclusionsTextField.delegate = self
+
+        inclusionsTextField.delegate = self
 
         clearButton.addTarget(self, action: #selector(didTapClear), for: .touchUpInside)
 
@@ -116,6 +132,7 @@ class ViewController: UIViewController {
         hstack.addArrangedSubview(clearButton)
 
         stackView.addArrangedSubview(exclusionsTextField)
+        stackView.addArrangedSubview(inclusionsTextField)
         stackView.addArrangedSubview(hstack)
         view.addSubview(answerView)
         view.addSubview(stackView)
@@ -153,11 +170,18 @@ class ViewController: UIViewController {
         }
     }
 
+    private func search() {
+        wordList.search(for: answerView.answer,
+                        excluding: exclusionsTextField.text,
+                        including: inclusionsTextField.text)
+    }
+
     @objc
     private func didTapClear() {
-        exclusionsTextField.text = ""
         answerView.clear()
-        wordList.search(for: nil)
+        exclusionsTextField.text = ""
+        inclusionsTextField.text = ""
+        search()
     }
 }
 
@@ -175,7 +199,7 @@ extension ViewController: UITextFieldDelegate {
                                                           with: string)
             }
 
-            wordList.search(for: answerView.answer, excluding: exclusionsTextField.text)
+            search()
 
             return false
         }
@@ -201,36 +225,26 @@ extension ViewController: UITextFieldDelegate {
             return false
         }
 
-        let newReplacementString: String
-        if character.isLetter || character == "." {
-            newReplacementString = string
-        } else {
-            newReplacementString = "."
-        }
-
         if let text = textField.text,
            let textRange = Range(range, in: text) {
             textField.text = text.replacingCharacters(in: textRange,
-                                                      with: newReplacementString)
+                                                      with: string)
         }
 
-        wordList.search(for: answerView.answer, excluding: exclusionsTextField.text)
+        search()
 
         return false
     }
 
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        exclusionsTextField.text = ""
-
-        wordList.search(for: answerView.answer, excluding: exclusionsTextField.text)
-
-        return false
+        search()
+        return true
     }
 }
 
 extension ViewController: AnswerViewDelegate {
     func answerDidChange(_ answer: String) {
-        wordList.search(for: answerView.answer, excluding: exclusionsTextField.text)
+        search()
     }
 }
 
