@@ -20,6 +20,8 @@ class WordList {
 
     private let exclusionsSubject = PassthroughSubject<String, Never>()
 
+    private let inclusionsSubject = PassthroughSubject<String, Never>()
+
     private let words: [String]
 
     private var subscription: AnyCancellable?
@@ -47,12 +49,12 @@ class WordList {
             fatalError("Word list is empty")
         }
 
-        subscription = Publishers.CombineLatest(answerSubject, exclusionsSubject)
+        subscription = Publishers.CombineLatest3(answerSubject, exclusionsSubject, inclusionsSubject)
             .throttle(for: .milliseconds(1000), scheduler: DispatchQueue.global(qos: .background), latest: true)
-            .sink(receiveValue: { [weak self] answer, exclusions in
+            .sink(receiveValue: { [weak self] answer, exclusions, inclusions in
                 guard let self = self else { return }
 
-                guard !answer.isEmpty, answer.count <= 5, answer.first(where: { $0 != "." }) != nil else {
+                guard !answer.isEmpty || !exclusions.isEmpty || !inclusions.isEmpty else {
                     self.resultsSubject.send([])
                     return
                 }
@@ -74,16 +76,34 @@ class WordList {
                     patternWithExcluded = pattern
                 }
 
-                let filteredWords = self.words.filter({
-                    $0.lowercased().range(of: "\\b\(patternWithExcluded)\\b", options: .regularExpression) != nil
-                })
+                var filteredWords: [String]
+                if patternWithExcluded.isEmpty {
+                    filteredWords = self.words
+                } else {
+                    filteredWords = self.words.filter({
+                        $0.lowercased().range(of: "\\b\(patternWithExcluded)\\b", options: .regularExpression) != nil
+                    })
+                }
+
+                if !exclusions.isEmpty {
+                    exclusions.forEach { c in
+                        filteredWords.removeAll(where: { $0.contains(c.lowercased()) })
+                    }
+                }
+
+                if !inclusions.isEmpty {
+                    inclusions.forEach { c in
+                        filteredWords.removeAll(where: { !$0.contains(c.lowercased()) })
+                    }
+                }
 
                 self.resultsSubject.send(filteredWords)
             })
     }
 
-    func search(for string: String?, excluding exclusions: String? = nil) {
+    func search(for string: String?, excluding exclusions: String? = nil, including inclusions: String? = nil) {
         answerSubject.send(string ?? "")
         exclusionsSubject.send(exclusions ?? "")
+        inclusionsSubject.send(inclusions ?? "")
     }
 }
