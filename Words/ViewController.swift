@@ -10,25 +10,18 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    private let answerView: AnswerView = {
+        let a = AnswerView(frame: .zero)
+        a.translatesAutoresizingMaskIntoConstraints = false
+        return a
+    }()
+
     private let stackView: UIStackView = {
         let s = UIStackView(frame: .zero)
         s.axis = .vertical
         s.spacing = 16
         s.translatesAutoresizingMaskIntoConstraints = false
         return s
-    }()
-
-    private let answerTextField: UITextField = {
-        let t = UITextField(frame: .zero)
-        t.placeholder = "Search for words"
-        t.borderStyle = .roundedRect
-        t.returnKeyType = .done
-        t.autocapitalizationType = .none
-        t.autocorrectionType = .no
-        t.clearButtonMode = .always
-        t.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .bold)
-        t.translatesAutoresizingMaskIntoConstraints = false
-        return t
     }()
 
     private let exclusionsTextField: UITextField = {
@@ -107,11 +100,11 @@ class ViewController: UIViewController {
     private func constructView() {
         let backgroundColor = UIColor(named: "Parchment")
         view.backgroundColor = backgroundColor
-        answerTextField.backgroundColor = backgroundColor
         exclusionsTextField.backgroundColor = backgroundColor
         tableView.backgroundColor = backgroundColor
 
-        answerTextField.delegate = self
+        answerView.delegate = self
+
         exclusionsTextField.delegate = self
 
         clearButton.addTarget(self, action: #selector(didTapClear), for: .touchUpInside)
@@ -122,16 +115,19 @@ class ViewController: UIViewController {
         hstack.addArrangedSubview(UIView())
         hstack.addArrangedSubview(clearButton)
 
-        stackView.addArrangedSubview(answerTextField)
         stackView.addArrangedSubview(exclusionsTextField)
         stackView.addArrangedSubview(hstack)
+        view.addSubview(answerView)
         view.addSubview(stackView)
         view.addSubview(tableView)
 
         let margin: CGFloat = 16
 
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: margin),
+            answerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: margin),
+            answerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin),
+            answerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin),
+            stackView.topAnchor.constraint(equalTo: answerView.bottomAnchor, constant: margin),
             stackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin),
             stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin),
             tableView.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: margin),
@@ -159,8 +155,8 @@ class ViewController: UIViewController {
 
     @objc
     private func didTapClear() {
-        answerTextField.text = ""
         exclusionsTextField.text = ""
+        answerView.clear()
         wordList.search(for: nil)
     }
 }
@@ -179,7 +175,7 @@ extension ViewController: UITextFieldDelegate {
                                                           with: string)
             }
 
-            wordList.search(for: answerTextField.text, excluding: exclusionsTextField.text)
+            wordList.search(for: answerView.answer, excluding: exclusionsTextField.text)
 
             return false
         }
@@ -200,16 +196,9 @@ extension ViewController: UITextFieldDelegate {
             return false
         }
 
-        if textField === answerTextField {
-            // Only allow letters, space, and period `.`
-            guard character.isLetter || character == " " || character == "." else {
-                return false
-            }
-        } else {
-            // Only allow letters in excluded characters field
-            guard character.isLetter else {
-                return false
-            }
+        // Only allow letters in excluded characters field
+        guard character.isLetter else {
+            return false
         }
 
         let newReplacementString: String
@@ -225,21 +214,23 @@ extension ViewController: UITextFieldDelegate {
                                                       with: newReplacementString)
         }
 
-        wordList.search(for: answerTextField.text, excluding: exclusionsTextField.text)
+        wordList.search(for: answerView.answer, excluding: exclusionsTextField.text)
 
         return false
     }
 
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        if textField === answerTextField {
-            answerTextField.text = ""
-        } else {
-            exclusionsTextField.text = ""
-        }
+        exclusionsTextField.text = ""
 
-        wordList.search(for: answerTextField.text, excluding: exclusionsTextField.text)
+        wordList.search(for: answerView.answer, excluding: exclusionsTextField.text)
 
         return false
+    }
+}
+
+extension ViewController: AnswerViewDelegate {
+    func answerDidChange(_ answer: String) {
+        wordList.search(for: answerView.answer, excluding: exclusionsTextField.text)
     }
 }
 
