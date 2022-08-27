@@ -32,6 +32,7 @@ class ViewController: UIViewController {
         t.returnKeyType = .done
         t.autocapitalizationType = .none
         t.autocorrectionType = .no
+        t.spellCheckingType = .no
         t.clearButtonMode = .always
         t.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .bold)
         t.translatesAutoresizingMaskIntoConstraints = false
@@ -46,6 +47,7 @@ class ViewController: UIViewController {
         t.returnKeyType = .done
         t.autocapitalizationType = .none
         t.autocorrectionType = .no
+        t.spellCheckingType = .no
         t.clearButtonMode = .always
         t.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .bold)
         t.translatesAutoresizingMaskIntoConstraints = false

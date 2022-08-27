@@ -117,6 +117,10 @@ class AnswerView: UIView {
 }
 
 extension AnswerView: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textField.selectAll(nil)
+    }
+
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         // Allow deletions
         if string == "" {
@@ -134,11 +138,6 @@ extension AnswerView: UITextFieldDelegate {
         // Dismiss keyboard
         if string == "\n" {
             textField.resignFirstResponder()
-            return false
-        }
-
-        // Prevent pasting into text field
-        if string.count > 1 {
             return false
         }
 
@@ -163,6 +162,10 @@ private class AnswerLetterTextField: UITextField {
     var value: String {
         let textValue = text ?? ""
         return textValue.isEmpty ? "." : textValue
+    }
+
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        return false
     }
 
     static func makeTextField() -> AnswerLetterTextField {
