@@ -5,4 +5,4 @@ A helper (aka cheating) app for the popular [Wordle](https://www.nytimes.com/gam
 - Enter letters that should be excluded from the possible answers
 - Enter letters that must be included in the possible answers
 
-![Demo video](demo.mov)
+![Demo video](demo.gif)
