@@ -75,6 +75,18 @@ class AnswerView: UIView {
         textField5.text = ""
     }
 
+    func tabNext() {
+        if textField1.isFirstResponder {
+            textField2.becomeFirstResponder()
+        } else if textField2.isFirstResponder {
+            textField3.becomeFirstResponder()
+        } else if textField3.isFirstResponder {
+            textField4.becomeFirstResponder()
+        } else if textField4.isFirstResponder {
+            textField5.becomeFirstResponder()
+        }
+    }
+
     private func constructView() {
         addSubview(answersStackView)
 
