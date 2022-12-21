@@ -19,6 +19,14 @@ class AnswerLetterTextField: UITextField {
 
     weak var answerLetterTextFieldDelegate: AnswerLetterTextFieldDelegate?
 
+    override func buildMenu(with builder: UIMenuBuilder) {
+        // Suppress "Search Web" on iOS 16
+        if #available(iOS 16.0, *) {
+            builder.remove(menu: .lookup)
+        }
+        super.buildMenu(with: builder)
+    }
+
     override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
         return false
     }
