@@ -25,32 +25,12 @@ class ViewController: UIViewController {
     }()
 
     private let exclusionsTextField: UITextField = {
-        let t = UITextField(frame: .zero)
-        t.backgroundColor = UIColor(named: "Parchment")
-        t.placeholder = "Excluding letters"
-        t.borderStyle = .roundedRect
-        t.returnKeyType = .done
-        t.autocapitalizationType = .none
-        t.autocorrectionType = .no
-        t.spellCheckingType = .no
-        t.clearButtonMode = .always
-        t.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .bold)
-        t.translatesAutoresizingMaskIntoConstraints = false
+        let t = UITextField.makeTextField()
         return t
     }()
 
     private let inclusionsTextField: UITextField = {
-        let t = UITextField(frame: .zero)
-        t.backgroundColor = UIColor(named: "Parchment")
-        t.placeholder = "Must include letters"
-        t.borderStyle = .roundedRect
-        t.returnKeyType = .done
-        t.autocapitalizationType = .none
-        t.autocorrectionType = .no
-        t.spellCheckingType = .no
-        t.clearButtonMode = .always
-        t.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .bold)
-        t.translatesAutoresizingMaskIntoConstraints = false
+        let t = UITextField.makeTextField()
         return t
     }()
 
@@ -118,7 +98,16 @@ class ViewController: UIViewController {
         hstack.addArrangedSubview(UIView())
         hstack.addArrangedSubview(clearButton)
 
+        let excludingLabel = UILabel.makeLabel(with: "Excluding letters")
+        stackView.addArrangedSubview(excludingLabel)
+        stackView.setCustomSpacing(4, after: excludingLabel)
+
         stackView.addArrangedSubview(exclusionsTextField)
+
+        let includingLabel = UILabel.makeLabel(with: "Must include letters")
+        stackView.addArrangedSubview(includingLabel)
+        stackView.setCustomSpacing(4, after: includingLabel)
+
         stackView.addArrangedSubview(inclusionsTextField)
         stackView.addArrangedSubview(hstack)
         view.addSubview(answerView)
@@ -256,9 +245,35 @@ extension ViewController: AnswerViewDelegate {
     }
 }
 
+private extension UILabel {
+    static func makeLabel(with text: String) -> UILabel {
+        let label = UILabel()
+        label.text = text
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textColor = .secondaryLabel
+        return label
+    }
+}
+
 private extension UITableViewCell {
     static var reuseIdentifier: String {
         return "WordCell"
+    }
+}
+
+private extension UITextField {
+    static func makeTextField() -> UITextField {
+        let textField = UITextField(frame: .zero)
+        textField.backgroundColor = UIColor(named: "Parchment")
+        textField.borderStyle = .roundedRect
+        textField.returnKeyType = .done
+        textField.autocapitalizationType = .none
+        textField.autocorrectionType = .no
+        textField.spellCheckingType = .no
+        textField.clearButtonMode = .always
+        textField.font = UIFont.monospacedSystemFont(ofSize: 20, weight: .bold)
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
     }
 }
 
