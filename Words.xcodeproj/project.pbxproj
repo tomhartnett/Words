@@ -14,6 +14,7 @@
 		E229D6B927BD37FD00A70A21 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E229D6B727BD37FD00A70A21 /* LaunchScreen.storyboard */; };
 		E229D6C127BD3A9F00A70A21 /* dictionary.txt in Resources */ = {isa = PBXBuildFile; fileRef = E229D6C027BD3A9F00A70A21 /* dictionary.txt */; };
 		E229D6C327BDD0C900A70A21 /* WordList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E229D6C227BDD0C900A70A21 /* WordList.swift */; };
+		E28DB0BA29534B2C00A79BE2 /* AnswerLetterTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E28DB0B929534B2C00A79BE2 /* AnswerLetterTextField.swift */; };
 		E2AB6D1C284CF32B005B6671 /* AnswerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AB6D1B284CF32B005B6671 /* AnswerView.swift */; };
 /* End PBXBuildFile section */
 
@@ -27,6 +28,7 @@
 		E229D6BA27BD37FD00A70A21 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E229D6C027BD3A9F00A70A21 /* dictionary.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dictionary.txt; sourceTree = "<group>"; };
 		E229D6C227BDD0C900A70A21 /* WordList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordList.swift; sourceTree = "<group>"; };
+		E28DB0B929534B2C00A79BE2 /* AnswerLetterTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerLetterTextField.swift; sourceTree = "<group>"; };
 		E2AB6D1B284CF32B005B6671 /* AnswerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -62,6 +64,7 @@
 			children = (
 				E229D6AC27BD37FC00A70A21 /* AppDelegate.swift */,
 				E229D6AE27BD37FC00A70A21 /* SceneDelegate.swift */,
+				E28DB0B929534B2C00A79BE2 /* AnswerLetterTextField.swift */,
 				E2AB6D1B284CF32B005B6671 /* AnswerView.swift */,
 				E229D6B027BD37FC00A70A21 /* ViewController.swift */,
 				E229D6C227BDD0C900A70A21 /* WordList.swift */,
@@ -149,6 +152,7 @@
 				E2AB6D1C284CF32B005B6671 /* AnswerView.swift in Sources */,
 				E229D6AD27BD37FC00A70A21 /* AppDelegate.swift in Sources */,
 				E229D6AF27BD37FC00A70A21 /* SceneDelegate.swift in Sources */,
+				E28DB0BA29534B2C00A79BE2 /* AnswerLetterTextField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -60,7 +60,7 @@ class AnswerView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        constructView()
+        setupView()
     }
 
     required init?(coder: NSCoder) {
@@ -87,7 +87,19 @@ class AnswerView: UIView {
         }
     }
 
-    private func constructView() {
+    func tabPrevious() {
+        if textField5.isFirstResponder {
+            textField4.becomeFirstResponder()
+        } else if textField4.isFirstResponder {
+            textField3.becomeFirstResponder()
+        } else if textField3.isFirstResponder {
+            textField2.becomeFirstResponder()
+        } else if textField2.isFirstResponder {
+            textField1.becomeFirstResponder()
+        }
+    }
+
+    private func setupView() {
         addSubview(answersStackView)
 
         let textFields = [textField1, textField2, textField3, textField4, textField5]
@@ -95,6 +107,7 @@ class AnswerView: UIView {
         textFields.forEach {
             answersStackView.addArrangedSubview($0)
             $0.delegate = self
+            $0.answerLetterTextFieldDelegate = self
         }
 
         var allConstraints = [NSLayoutConstraint]()
@@ -133,17 +146,23 @@ extension AnswerView: UITextFieldDelegate {
         textField.selectAll(nil)
     }
 
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    func textField(_ textField: UITextField,
+                   shouldChangeCharactersIn range: NSRange,
+                   replacementString string: String) -> Bool
+    {
         // Allow deletions
         if string == "" {
             if let text = textField.text,
                let textRange = Range(range, in: text) {
                 textField.text = text.replacingCharacters(in: textRange,
                                                           with: string)
-
-                delegate?.answerDidChange(answer)
             }
 
+            return false
+        }
+
+        if string == " " {
+            tabNext()
             return false
         }
 
@@ -170,28 +189,8 @@ extension AnswerView: UITextFieldDelegate {
     }
 }
 
-private class AnswerLetterTextField: UITextField {
-    var value: String {
-        let textValue = text ?? ""
-        return textValue.isEmpty ? "." : textValue
-    }
-
-    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        return false
-    }
-
-    static func makeTextField() -> AnswerLetterTextField {
-        let t = AnswerLetterTextField(frame: .zero)
-        t.autocorrectionType = .no
-        t.autocapitalizationType = .none
-        t.backgroundColor = UIColor(named: "Parchment")
-        t.borderStyle = .roundedRect
-        t.clearButtonMode = .never
-        t.font = UIFont.monospacedSystemFont(ofSize: 48, weight: .regular)
-        t.minimumFontSize = 20
-        t.adjustsFontSizeToFitWidth = true
-        t.returnKeyType = .done
-        t.textAlignment = .center
-        return t
+extension AnswerView: AnswerLetterTextFieldDelegate {
+    func didTapDelete() {
+        tabPrevious()
     }
 }

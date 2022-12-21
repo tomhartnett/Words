@@ -91,31 +91,16 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        constructView()
+        setupView()
 
-        configureTable()
+        setupTable()
 
-        wordList.results
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [unowned self] words in
-                let count = words.count
-                if count == 1 {
-                    resultsLabel.text = "\(count) word"
-                } else {
-                    resultsLabel.text = "\(count) words"
-                }
-
-                var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
-                snapshot.appendSections([.words])
-                snapshot.appendItems(words)
-                self.dataSource?.apply(snapshot, animatingDifferences: false)
-            })
-            .store(in: &subsciptions)
+        setupSubscription()
 
         search()
     }
 
-    private func constructView() {
+    private func setupView() {
 
         view.backgroundColor = UIColor(named: "Parchment")
 
@@ -156,7 +141,7 @@ class ViewController: UIViewController {
         ])
     }
 
-    private func configureTable() {
+    private func setupTable() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
         dataSource = ResultsDataSource(tableView: tableView) { t, indexPath, word in
             let cell = t.dequeueReusableCell(withIdentifier: UITableViewCell.reuseIdentifier, for: indexPath)
@@ -170,6 +155,25 @@ class ViewController: UIViewController {
 
             return cell
         }
+    }
+
+    private func setupSubscription() {
+        wordList.results
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [unowned self] words in
+                let count = words.count
+                if count == 1 {
+                    resultsLabel.text = "\(count) word"
+                } else {
+                    resultsLabel.text = "\(count) words"
+                }
+
+                var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
+                snapshot.appendSections([.words])
+                snapshot.appendItems(words)
+                self.dataSource?.apply(snapshot, animatingDifferences: false)
+            })
+            .store(in: &subsciptions)
     }
 
     private func search() {
