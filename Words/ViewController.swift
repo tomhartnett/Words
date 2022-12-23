@@ -240,7 +240,6 @@ extension ViewController: UITextFieldDelegate {
 
 extension ViewController: AnswerViewDelegate {
     func answerDidChange(_ answer: String) {
-        answerView.tabNext()
         search()
     }
 }

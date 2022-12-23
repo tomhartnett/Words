@@ -75,30 +75,6 @@ class AnswerView: UIView {
         textField5.text = ""
     }
 
-    func tabNext() {
-        if textField1.isFirstResponder {
-            textField2.becomeFirstResponder()
-        } else if textField2.isFirstResponder {
-            textField3.becomeFirstResponder()
-        } else if textField3.isFirstResponder {
-            textField4.becomeFirstResponder()
-        } else if textField4.isFirstResponder {
-            textField5.becomeFirstResponder()
-        }
-    }
-
-    func tabPrevious() {
-        if textField5.isFirstResponder {
-            textField4.becomeFirstResponder()
-        } else if textField4.isFirstResponder {
-            textField3.becomeFirstResponder()
-        } else if textField3.isFirstResponder {
-            textField2.becomeFirstResponder()
-        } else if textField2.isFirstResponder {
-            textField1.becomeFirstResponder()
-        }
-    }
-
     private func setupView() {
         addSubview(answersStackView)
 
@@ -139,6 +115,30 @@ class AnswerView: UIView {
 
         NSLayoutConstraint.activate(allConstraints)
     }
+
+    private func tabNext() {
+        if textField1.isFirstResponder {
+            textField2.becomeFirstResponder()
+        } else if textField2.isFirstResponder {
+            textField3.becomeFirstResponder()
+        } else if textField3.isFirstResponder {
+            textField4.becomeFirstResponder()
+        } else if textField4.isFirstResponder {
+            textField5.becomeFirstResponder()
+        }
+    }
+
+    private func tabPrevious() {
+        if textField5.isFirstResponder {
+            textField4.becomeFirstResponder()
+        } else if textField4.isFirstResponder {
+            textField3.becomeFirstResponder()
+        } else if textField3.isFirstResponder {
+            textField2.becomeFirstResponder()
+        } else if textField2.isFirstResponder {
+            textField1.becomeFirstResponder()
+        }
+    }
 }
 
 extension AnswerView: UITextFieldDelegate {
@@ -156,6 +156,8 @@ extension AnswerView: UITextFieldDelegate {
                let textRange = Range(range, in: text) {
                 textField.text = text.replacingCharacters(in: textRange,
                                                           with: string)
+
+                delegate?.answerDidChange(answer)
             }
 
             return false
@@ -182,6 +184,8 @@ extension AnswerView: UITextFieldDelegate {
         }
 
         textField.text = string.uppercased()
+
+        tabNext()
 
         delegate?.answerDidChange(answer)
 
