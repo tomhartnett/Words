@@ -174,6 +174,12 @@ extension AnswerView: UITextFieldDelegate {
             return false
         }
 
+        // Ensure only one character of input.
+        // Pasting or swipe typing could add more than one.
+        if string.count > 1 {
+            return false
+        }
+
         // Not sure what would fail here, but need Character
         guard let character = string.first else {
             return false

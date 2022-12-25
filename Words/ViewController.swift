@@ -205,7 +205,8 @@ extension ViewController: UITextFieldDelegate {
             return false
         }
 
-        // Prevent pasting into text field
+        // Ensure only one character of input.
+        // Pasting or swipe typing could add more than one.
         if string.count > 1 {
             return false
         }
