@@ -27,23 +27,19 @@ class WordList {
     private var subscription: AnyCancellable?
 
     init() {
-        guard let url = Bundle.main.url(forResource: "dictionary", withExtension: "txt") else {
-            fatalError("Word list not found")
+        guard let url = Bundle.main.url(forResource: "words", withExtension: "json") else {
+            fatalError("Word list JSON file not found in app bundle")
         }
 
         guard let data = try? Data(contentsOf: url) else {
             fatalError("Failed to read file at \(url.path)")
         }
 
-        let allWords = String(data: data, encoding: .utf8)
-        self.words = allWords?.split(separator: "\n").compactMap {
-            let word = String($0)
-            if word.count == 5 {
-                return word
-            } else {
-                return nil
-            }
-        } ?? []
+        do {
+            words = try JSONDecoder().decode([String].self, from: data)
+        } catch {
+            fatalError("Failed to decode word list: \(error.localizedDescription)")
+        }
 
         guard !words.isEmpty else {
             fatalError("Word list is empty")
